@@ -1,0 +1,339 @@
+/* ==========================================
+   CONVERGEDESK — HERO SPATIAL EXPERIENCE STYLES
+   Cinematic Real-time 3D + GSAP ScrollTrigger
+========================================== */
+
+/* ── 1. Hero Scroll Container ── */
+.hero-wrapper {
+  position: relative;
+  height: 520vh; /* Smooth scrub depth */
+  background: #080909;
+}
+
+.hero-canvas-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #080909;
+}
+
+/* Three.js Canvas fills container */
+.hero-canvas-sticky canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+/* ── 2. Overlay Layer ── */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-overlay a,
+.hero-overlay button,
+.hero-overlay .cd-nav {
+  pointer-events: all;
+}
+
+/* ── 3. Dedicated Headline Zone (Non-Obstructing) ── */
+.hero-copy {
+  position: absolute;
+  top: 110px;
+  left: 6%;
+  max-width: 460px;
+  pointer-events: all;
+  z-index: 20;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  letter-spacing: 2.2px;
+  color: #72737c;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+  animation: live-pulse 2s ease-in-out infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+}
+
+.hero-h1 {
+  font-size: clamp(34px, 4.4vw, 56px);
+  font-weight: 550;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #f0efe9;
+  margin: 0 0 18px;
+  font-family: "Inter", -apple-system, sans-serif;
+}
+
+.hero-line {
+  display: block;
+}
+
+.hero-line.accent {
+  color: #7c5cfc;
+  background: linear-gradient(135deg, #a78bfa 0%, #7c5cfc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-desc {
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: #72737c;
+  max-width: 410px;
+  margin: 0 0 28px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+/* ── 4. Phase Status Indicators (Top Right) ── */
+.hero-phase-container {
+  position: absolute;
+  top: 96px;
+  right: 6%;
+  pointer-events: none;
+}
+
+.hero-phase-label {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(14, 15, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  white-space: nowrap;
+}
+
+.phase-num {
+  font-size: 9px;
+  font-weight: 700;
+  color: #7c5cfc;
+  letter-spacing: 1.5px;
+}
+
+.phase-text {
+  font-size: 8.5px;
+  letter-spacing: 2px;
+  color: #a0a0ab;
+}
+
+/* ── 5. Stage D Final Reveal Card ── */
+.hero-reveal {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  width: min(90%, 640px);
+  background: rgba(12, 13, 18, 0.82);
+  border: 1px solid rgba(124, 92, 252, 0.28);
+  border-radius: 20px;
+  padding: 34px 44px;
+  text-align: center;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(124, 92, 252, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.hero-reveal-pill {
+  display: inline-block;
+  font-size: 8.5px;
+  letter-spacing: 2.2px;
+  font-weight: 700;
+  color: #7c5cfc;
+  background: rgba(124, 92, 252, 0.12);
+  border: 1px solid rgba(124, 92, 252, 0.3);
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.hero-reveal-h2 {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 550;
+  letter-spacing: -0.04em;
+  color: #f0efe9;
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+
+.hero-reveal-h2 span {
+  color: #7c5cfc;
+}
+
+.hero-reveal-desc {
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: #8c8d97;
+  max-width: 480px;
+  margin: 0 auto 24px;
+}
+
+.hero-reveal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-reveal-actions .cd-nav-cta {
+  border-color: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 14px 24px;
+}
+
+/* ── 6. Scroll Hint Indicator ── */
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #63646e;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.scroll-indicator-bar {
+  width: 1.5px;
+  height: 36px;
+  background: linear-gradient(to bottom, #7c5cfc, transparent);
+  animation: scroll-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+    opacity: 0.2;
+  }
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+  }
+  51% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+    opacity: 0.2;
+  }
+}
+
+/* ── 7. Responsive Breakpoints ── */
+@media (max-width: 900px) {
+  .hero-copy {
+    top: 90px;
+    left: 5%;
+    max-width: 360px;
+  }
+
+  .hero-h1 {
+    font-size: 32px;
+  }
+
+  .hero-phase-container {
+    top: 90px;
+    right: 5%;
+  }
+
+  .hero-reveal {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-copy {
+    top: 84px;
+    left: 20px;
+    right: 20px;
+    max-width: none;
+  }
+
+  .hero-h1 {
+    font-size: 28px;
+  }
+
+  .hero-phase-container {
+    display: none;
+  }
+
+  .hero-scroll-hint {
+    bottom: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wrapper {
+    height: 100vh;
+  }
+
+  .live-dot,
+  .scroll-indicator-bar {
+    animation: none;
+  }
+}

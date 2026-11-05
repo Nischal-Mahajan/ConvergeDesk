@@ -1,0 +1,106 @@
+from django.urls import path
+
+from .views import (
+    WorkspaceListCreateView,
+    RegisterView,
+    ProjectListCreateView,
+    ProjectDetailView,
+    WorkspaceMemberListView,
+    WorkspaceMemberCreateView,
+    WorkspaceInvitationCreateView,
+    WorkspaceInvitationAcceptView,
+    WorkspaceMemberRoleUpdateView,
+    WorkspaceMemberDeleteView,
+    TaskListCreateView,
+    TaskDetailView,
+    WorkspaceInvitationListView,
+    WorkspaceInvitationRevokeView,
+    ProjectDocumentListCreateView,
+    DocumentDetailView,
+    CollaborationAuthorizationView,
+)
+
+urlpatterns = [
+    path(
+        "workspaces/",
+        WorkspaceListCreateView.as_view(),
+        name="workspace-list-create",
+    ),
+    path(
+        "register/",
+        RegisterView.as_view(),
+        name="register",
+    ),
+    path(
+        "projects/",
+        ProjectListCreateView.as_view(),
+        name="project-list-create",
+    ),
+    path(
+        "projects/<int:pk>/",
+        ProjectDetailView.as_view(),
+        name="project-detail",
+    ),
+    path("tasks/", TaskListCreateView.as_view(), name="task-list-create"),
+    path("tasks/<int:pk>/", TaskDetailView.as_view(), name="task-detail"),
+    path(
+        "workspaces/<int:workspace_id>/members/",
+        WorkspaceMemberListView.as_view(),
+        name="workspace-members",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/members/add/",
+        WorkspaceMemberCreateView.as_view(),
+        name="workspace-member-add",
+    ),
+    path(
+    "workspaces/<int:workspace_id>/invitations/",
+    WorkspaceInvitationCreateView.as_view(),
+    name="workspace-invitation-create",
+    ),
+    path(
+    "invitations/<uuid:token>/accept/",
+        WorkspaceInvitationAcceptView.as_view(),
+        name="workspace-invitation-accept",
+    ),
+    path(
+    "workspaces/<int:workspace_id>/members/<int:member_id>/role/",
+        WorkspaceMemberRoleUpdateView.as_view(),
+        name="workspace-member-role-update",
+    ),
+    path(
+    "workspaces/<int:workspace_id>/members/<int:member_id>/",
+    WorkspaceMemberDeleteView.as_view(),
+    name="workspace-member-delete",
+    ),
+    path(
+    "workspaces/<int:workspace_id>/invitations/",
+    WorkspaceInvitationCreateView.as_view(),
+    name="workspace-invitation-create",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/invitations/pending/",
+        WorkspaceInvitationListView.as_view(),
+        name="workspace-invitation-list",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/invitations/<int:invitation_id>/revoke/",
+        WorkspaceInvitationRevokeView.as_view(),
+        name="workspace-invitation-revoke",
+    ),
+    path(
+        "projects/<int:project_id>/documents/",
+        ProjectDocumentListCreateView.as_view(),
+        name="project-document-list-create",
+    ),
+    path(
+        "documents/<int:pk>/",
+        DocumentDetailView.as_view(),
+        name="document-detail",
+    ),
+    path(
+        "collaboration/documents/<int:pk>/authorize/",
+        CollaborationAuthorizationView.as_view(),
+        name="collaboration-authorize",
+    ),
+]

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "./services/api";
+import WhiteboardManager from "./features/whiteboard/WhiteboardManager";
 import "./App.css";
 
 function Dashboard() {
@@ -9,6 +10,7 @@ function Dashboard() {
   const [documentSaving, setDocumentSaving] = useState(false);
   const [deletingDocumentId, setDeletingDocumentId] = useState(null);
   const [selectedDocumentProjectId, setSelectedDocumentProjectId] = useState("");
+  const [selectedWhiteboardProjectId, setSelectedWhiteboardProjectId] = useState("");
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [documentTitle, setDocumentTitle] = useState("");
   const [documentContent, setDocumentContent] = useState("");
@@ -575,6 +577,13 @@ async function handleDeleteProject(project) {
       (project) => String(project.workspace) === String(selectedWorkspaceId)
     );
     setSelectedDocumentProjectId((previous) => {
+      const stillExists = workspaceProjects.some(
+        (project) => String(project.id) === String(previous)
+      );
+      return stillExists ? String(previous) : workspaceProjects.length ? String(workspaceProjects[0].id) : "";
+    });
+
+    setSelectedWhiteboardProjectId((previous) => {
       const stillExists = workspaceProjects.some(
         (project) => String(project.id) === String(previous)
       );
@@ -1236,6 +1245,51 @@ async function handleDeleteProject(project) {
                 </div>
               </form>
             </>
+          )}
+        </section>
+
+        <section className="content-card" id="whiteboards-section" style={{ marginBottom: "24px" }}>
+          <div className="card-heading">
+            <div>
+              <h3>Real-Time Collaborative Whiteboards</h3>
+              <p>Visual brainstorm boards synchronized live across your engineering team.</p>
+            </div>
+          </div>
+
+          {!selectedWorkspaceId ? (
+            <div className="empty-state">
+              <h4>Select a workspace</h4>
+              <p>Choose a workspace before opening its whiteboards.</p>
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div className="empty-state">
+              <h4>Create a project first</h4>
+              <p>Whiteboards belong to a project. Create a project to start drawing.</p>
+            </div>
+          ) : (
+            <div>
+              <div style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px" }}>
+                <label htmlFor="whiteboard-project-select" style={{ fontWeight: "600", fontSize: "14px" }}>
+                  Project:
+                </label>
+                <select
+                  id="whiteboard-project-select"
+                  value={selectedWhiteboardProjectId}
+                  onChange={(e) => setSelectedWhiteboardProjectId(e.target.value)}
+                  style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                >
+                  {filteredProjects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {selectedWhiteboardProjectId && (
+                <WhiteboardManager projectId={selectedWhiteboardProjectId} />
+              )}
+            </div>
           )}
         </section>
 

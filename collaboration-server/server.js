@@ -20,67 +20,122 @@ const server = new Server({
       throw new Error("Authentication required");
     }
 
-    const match = /^convergedesk-document-(\d+)$/.exec(documentName);
+    const docMatch = /^convergedesk-document-(\d+)$/.exec(documentName);
+    const whiteboardMatch = /^convergedesk-whiteboard-(\d+)$/.exec(documentName);
 
-    if (!match) {
-      throw new Error("Invalid document room");
-    }
+    if (docMatch) {
+      const documentId = docMatch[1];
+      const response = await fetch(
+        `${process.env.DJANGO_API_URL}/collaboration/documents/${documentId}/authorize/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    const documentId = match[1];
-
-    const response = await fetch(
-      `${process.env.DJANGO_API_URL}/collaboration/documents/${documentId}/authorize/`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
+      if (!response.ok) {
         const body = await response.text();
-
         console.error(
-            "[onAuthenticate] Django rejected request:",
-            response.status,
-            body
+          "[onAuthenticate] Django rejected document auth:",
+          response.status,
+          body
         );
-
         throw new Error("Document access denied");
+      }
+
+      return { documentId, type: "document" };
     }
 
-    return { documentId };
+    if (whiteboardMatch) {
+      const whiteboardId = whiteboardMatch[1];
+      const response = await fetch(
+        `${process.env.DJANGO_API_URL}/collaboration/whiteboards/${whiteboardId}/authorize/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const body = await response.text();
+        console.error(
+          "[onAuthenticate] Django rejected whiteboard auth:",
+          response.status,
+          body
+        );
+        throw new Error("Whiteboard access denied");
+      }
+
+      return { whiteboardId, type: "whiteboard" };
+    }
+
+    throw new Error("Invalid collaboration room");
   },
 
   async onLoadDocument({ documentName, document }) {
-    const match = /^convergedesk-document-(\d+)$/.exec(documentName);
-    if (!match) throw new Error("Invalid document room");
+    const docMatch = /^convergedesk-document-(\d+)$/.exec(documentName);
+    const whiteboardMatch = /^convergedesk-whiteboard-(\d+)$/.exec(documentName);
 
-    const result = await pool.query(
-      `SELECT state FROM core_collaborationstate WHERE document_id = $1`,
-      [match[1]]
-    );
+    if (docMatch) {
+      const result = await pool.query(
+        `SELECT state FROM core_collaborationstate WHERE document_id = $1`,
+        [docMatch[1]]
+      );
 
-    if (result.rows.length > 0 && result.rows[0].state) {
-      const Y = require("yjs");
-      Y.applyUpdate(document, new Uint8Array(result.rows[0].state));
+      if (result.rows.length > 0 && result.rows[0].state) {
+        const Y = require("yjs");
+        Y.applyUpdate(document, new Uint8Array(result.rows[0].state));
+      }
+      return;
     }
+
+    if (whiteboardMatch) {
+      const result = await pool.query(
+        `SELECT state FROM core_whiteboardstate WHERE whiteboard_id = $1`,
+        [whiteboardMatch[1]]
+      );
+
+      if (result.rows.length > 0 && result.rows[0].state) {
+        const Y = require("yjs");
+        Y.applyUpdate(document, new Uint8Array(result.rows[0].state));
+      }
+      return;
+    }
+
+    throw new Error("Invalid collaboration room");
   },
 
   async onStoreDocument({ documentName, document }) {
-    const match = /^convergedesk-document-(\d+)$/.exec(documentName);
-    if (!match) throw new Error("Invalid document room");
-
+    const docMatch = /^convergedesk-document-(\d+)$/.exec(documentName);
+    const whiteboardMatch = /^convergedesk-whiteboard-(\d+)$/.exec(documentName);
     const Y = require("yjs");
     const state = Buffer.from(Y.encodeStateAsUpdate(document));
 
-    await pool.query(
-      `INSERT INTO core_collaborationstate (document_id, state, updated_at)
-       VALUES ($1, $2, NOW())
-       ON CONFLICT (document_id)
-       DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
-      [match[1], state]
-    );
+    if (docMatch) {
+      await pool.query(
+        `INSERT INTO core_collaborationstate (document_id, state, updated_at)
+         VALUES ($1, $2, NOW())
+         ON CONFLICT (document_id)
+         DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
+        [docMatch[1], state]
+      );
+      return;
+    }
+
+    if (whiteboardMatch) {
+      await pool.query(
+        `INSERT INTO core_whiteboardstate (whiteboard_id, state, updated_at)
+         VALUES ($1, $2, NOW())
+         ON CONFLICT (whiteboard_id)
+         DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
+        [whiteboardMatch[1], state]
+      );
+      return;
+    }
+
+    throw new Error("Invalid collaboration room");
   },
 });
 

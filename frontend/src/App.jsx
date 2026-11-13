@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import YjsTest from "./YjsTest";
+import WhiteboardPage from "./features/whiteboard/WhiteboardPage";
 
 function App() {
   const isLoggedIn = Boolean(
@@ -44,6 +45,24 @@ function App() {
           element={
             isLoggedIn
               ? <Dashboard />
+              : <Navigate to="/login" replace />
+          }
+        />
+
+        <Route
+          path="/whiteboards/:whiteboardId"
+          element={
+            isLoggedIn
+              ? <WhiteboardPage />
+              : <Navigate to="/login" replace />
+          }
+        />
+
+        <Route
+          path="/projects/:projectId/whiteboards/:whiteboardId"
+          element={
+            isLoggedIn
+              ? <WhiteboardPage />
               : <Navigate to="/login" replace />
           }
         />

@@ -7,6 +7,7 @@ from .models import Task
 from .models import Membership
 from .models import WorkspaceInvitation
 from .models import Document
+from .models import Whiteboard
 
 class WorkspaceSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(
@@ -241,3 +242,32 @@ class DocumentSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+
+class WhiteboardSerializer(serializers.ModelSerializer):
+    created_by_username = serializers.CharField(
+        source="created_by.username",
+        read_only=True
+    )
+
+    class Meta:
+        model = Whiteboard
+        fields = [
+            "id",
+            "project",
+            "title",
+            "created_by",
+            "created_by_username",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "project",
+            "created_by",
+            "created_by_username",
+            "created_at",
+            "updated_at",
+        ]
+

@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 from .models import Membership, WorkspaceInvitation
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .models import Document
+from .models import Document, Whiteboard
 from .serializers import (
     WorkspaceSerializer,
     RegistrationSerializer,
@@ -24,6 +24,7 @@ from .serializers import (
     UpdateWorkspaceMemberRoleSerializer,
     WorkspaceInvitationSerializer,
     DocumentSerializer,
+    WhiteboardSerializer,
 )
 
 User = get_user_model()
@@ -727,3 +728,92 @@ class CollaborationAuthorizationView(APIView):
             "document_id": document.id,
             "project_id": document.project_id,
         })
+
+
+
+class ProjectWhiteboardListCreateView(generics.ListCreateAPIView):
+    serializer_class = WhiteboardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_project(self):
+        return get_object_or_404(
+            Project.objects.filter(
+                workspace__memberships__user=self.request.user
+            ).distinct(),
+            pk=self.kwargs["project_id"]
+        )
+
+    def get_queryset(self):
+        return Whiteboard.objects.filter(
+            project_id=self.kwargs["project_id"],
+            project__workspace__memberships__user=self.request.user
+        ).select_related(
+            "project", "created_by"
+        ).distinct()
+
+    def list(self, request, *args, **kwargs):
+        self.get_project()
+        return super().list(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        project = self.get_project()
+        serializer.save(
+            project=project,
+            created_by=self.request.user
+        )
+
+
+class WhiteboardDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = WhiteboardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Whiteboard.objects.filter(
+            project__workspace__memberships__user=self.request.user
+        ).select_related(
+            "project", "project__workspace", "created_by"
+        ).distinct()
+
+    def perform_destroy(self, instance):
+        membership = Membership.objects.filter(
+            workspace=instance.project.workspace,
+            user=self.request.user
+        ).first()
+
+        if not membership:
+            raise PermissionDenied(
+                "You do not have access to this whiteboard."
+            )
+
+        if (
+            membership.role not in [
+                Membership.Role.OWNER,
+                Membership.Role.ADMIN,
+            ]
+            and instance.created_by_id != self.request.user.id
+        ):
+            raise PermissionDenied(
+                "Only the whiteboard creator, workspace owners, "
+                "or admins can delete whiteboards."
+            )
+
+        instance.delete()
+
+
+class WhiteboardCollaborationAuthorizationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        whiteboard = get_object_or_404(
+            Whiteboard.objects.filter(
+                project__workspace__memberships__user=request.user
+            ).distinct(),
+            pk=pk,
+        )
+
+        return Response({
+            "authorized": True,
+            "whiteboard_id": whiteboard.id,
+            "project_id": whiteboard.project_id,
+        })
+

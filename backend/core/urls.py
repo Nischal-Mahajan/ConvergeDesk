@@ -18,6 +18,9 @@ from .views import (
     ProjectDocumentListCreateView,
     DocumentDetailView,
     CollaborationAuthorizationView,
+    ProjectWhiteboardListCreateView,
+    WhiteboardDetailView,
+    WhiteboardCollaborationAuthorizationView,
 )
 
 urlpatterns = [
@@ -102,5 +105,20 @@ urlpatterns = [
         "collaboration/documents/<int:pk>/authorize/",
         CollaborationAuthorizationView.as_view(),
         name="collaboration-authorize",
+    ),
+    path(
+        "projects/<int:project_id>/whiteboards/",
+        ProjectWhiteboardListCreateView.as_view(),
+        name="project-whiteboard-list-create",
+    ),
+    path(
+        "whiteboards/<int:pk>/",
+        WhiteboardDetailView.as_view(),
+        name="whiteboard-detail",
+    ),
+    path(
+        "collaboration/whiteboards/<int:pk>/authorize/",
+        WhiteboardCollaborationAuthorizationView.as_view(),
+        name="whiteboard-collaboration-authorize",
     ),
 ]

@@ -258,3 +258,41 @@ class CollaborationState(models.Model):
 
     def __str__(self):
         return f"Collaboration state for document {self.document_id}"
+
+
+
+class Whiteboard(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="whiteboards"
+    )
+
+    title = models.CharField(max_length=200)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="created_whiteboards"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+
+
+class WhiteboardState(models.Model):
+    whiteboard = models.OneToOneField(
+        Whiteboard,
+        on_delete=models.CASCADE,
+        related_name="whiteboard_state",
+    )
+    state = models.BinaryField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Whiteboard state for whiteboard {self.whiteboard_id}"
+

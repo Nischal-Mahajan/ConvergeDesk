@@ -12,6 +12,7 @@ import LandingPage from "./pages/LandingPage";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import YjsTest from "./YjsTest";
 import WhiteboardPage from "./features/whiteboard/WhiteboardPage";
+import CollaborativeWhiteboard from "./features/whiteboard/CollaborativeWhiteboard";
 
 function App() {
   const isLoggedIn = Boolean(
@@ -82,6 +83,18 @@ function App() {
             isLoggedIn
               ? <CollaborativeEditorTest />
               : <Navigate to="/login" replace />
+          }
+        />
+
+        <Route
+          path="/whiteboard-preview"
+          element={
+            <div style={{ height: "100vh", width: "100vw", overflow: "hidden" }}>
+              <CollaborativeWhiteboard
+                whiteboardId="preview"
+                title="ConvergeDesk Whiteboard Preview"
+              />
+            </div>
           }
         />
 

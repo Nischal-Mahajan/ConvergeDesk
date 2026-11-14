@@ -117,7 +117,7 @@ export default function CollaborativeWhiteboard({
       url: "ws://localhost:1234",
       name: `convergedesk-whiteboard-${whiteboardId}`,
       document: ydoc,
-      token: getFreshAccessToken,
+      token: whiteboardId === "preview" ? "preview-token" : getFreshAccessToken,
     });
     providerRef.current = provider;
 
